@@ -101,9 +101,9 @@ class Graph
 {
     class Node 
     {
-        public int vert;
-        public int wgt;
-        public Node next;
+        public int vert; // Vertices
+        public int wgt; // Weight
+        public Node next; // Next node
     }
 
     // V = number of vertices
@@ -205,11 +205,11 @@ class Graph
         System.out.println("");
     }
 
+
+    // Prim's Minimum Spanning Tree Algorithm
     public void MST_Prim(int s) 
     {
         int v;
-        // int u;
-        // int wgt;
         int wgt_sum = 0;
         int[] dist, parent, hPos;
         Node t;
@@ -219,7 +219,7 @@ class Graph
         parent = new int[V + 1];
         hPos = new int[V + 1];
 
-        for (int i = 0; i <= V; i++) 
+        for (int i = 1; i <= V; i++) 
         {
             dist[i] = Integer.MAX_VALUE;
             parent[i] = 0;
@@ -237,7 +237,7 @@ class Graph
         {
             v = pq.remove();
 
-            // Mark vertex as visited
+            // Mark vertex as visited by negating the distance
             dist[v] = -dist[v];
 
             t = adj[v];
@@ -303,8 +303,75 @@ class Graph
         System.out.print("\n\n");
     }
 
+    // Dijkstra's Shortest Path Algorithm
     public void SPT_Dijkstra(int s)
     {
+        int v;
+        int wgt_sum = 0;
+        int[] dist, parent, hPos;
+        Node t;
+
+        // Initialise arrays
+        dist = new int[V + 1];
+        parent = new int[V + 1];
+        hPos = new int[V + 1];
+
+        for (int i = 0; i <= V; i++) 
+        {
+            dist[i] = Integer.MAX_VALUE;
+            parent[i] = 0;
+            hPos[i] = 0;
+        }
+
+        Heap pq = new Heap(V, dist, hPos);
+        pq.insert(s);
+
+        while (!(pq.isEmpty())) 
+        {
+            v = pq.remove();
+
+            // Mark vertex as visited
+            dist[v] = -dist[v];
+
+            t = adj[v];
+
+            // Check if vertex has an edge to v
+            while (t.next != t) 
+            {
+                // If dist[t.vert] is less than 0, this vertex has been checked
+                if (t.wgt < dist[t.vert] && dist[t.vert] > 0) 
+                {
+                    dist[t.vert] = t.wgt;
+                    parent[t.vert] = v;
+
+                    if (hPos[t.vert] == 0) 
+                    {
+                        pq.insert(t.vert);
+                    } 
+                    else 
+                    {
+                        pq.siftUp(hPos[t.vert]);
+                    }
+                }
+
+                // Set t to the next node
+                t = t.next;
+            }
+        }
+
+            // Add up all edge weights of the SPT
+            for (int i = 0; i <= V; i++) 
+            {
+                wgt_sum += dist[i];
+            }
+    
+            // Make sure result is positive integer for printing the final SPT weight
+            wgt_sum *= -1;
+    
+            // Print final SPT Weight
+            System.out.print("\n\n\nTOTAL MST WEIGHT ->> " + wgt_sum + "\n\n");
+    
+            mst = parent;
 
     }
 
@@ -313,6 +380,7 @@ class Graph
 
     }
 
+    // Depth First Traversal
     public void DF(int s) 
     {
         id = 0;
@@ -342,6 +410,7 @@ class Graph
         }
     }
 
+    // Breadth First Traversal
     public void BF(int s) 
     {
         int id = 0;
@@ -377,7 +446,6 @@ class Graph
 
         // Newlines for formatting
         System.out.print("\n\n");
-
     }
 }
 
@@ -401,7 +469,6 @@ public class GraphLists
 
         System.out.print("Depth first using recursion:");
        
-
         g.DF(s);
 
         g.MST_Prim(s);
@@ -413,7 +480,6 @@ public class GraphLists
         g.BF(s); 
         
         sc.close();
-
     }
 }
 
