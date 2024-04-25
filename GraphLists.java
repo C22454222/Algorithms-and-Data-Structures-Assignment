@@ -77,15 +77,21 @@ import java.util.LinkedList;
 
     public void insert(int x) 
     {
-        System.out.println("Inserting: " + x);
+        System.out.println("Inserting: " + toChar(x) + "\n");
+        System.out.println("Visiting node: " + toChar(x) + "\n");
         a[++N] = x;
         siftUp(N);
+    }
+    
+    private char toChar(int u) 
+    {
+        return (char) (u + 64);
     }
 
     public int remove() 
     {
         int v = a[1];
-        System.out.println("Removing: " + v);
+        System.out.println("Removing:  " + toChar(v) + "\n");
         hPos[v] = 0;
 
         a[1] = a[N--];
@@ -196,6 +202,9 @@ class Graph
         int v;
         Node n;
 
+        System.out.println("\nAdjacency lists data structure:\n");
+        System.out.println("Vertex      Edge Weight");
+
         for (v = 1; v <= V; ++v) 
         {
             System.out.print("\nadj[" + toChar(v) + "] ->");
@@ -276,32 +285,12 @@ class Graph
         wgt_sum *= -1;
 
         // Print final MST Weight
-        System.out.print("\n\n\nTOTAL MST WEIGHT ->> " + wgt_sum + "\n\n");
+        System.out.print("\nTOTAL MST WEIGHT ->> " + wgt_sum + "\n");
 
         mst = parent;
     }
 
-    public void showMST() 
-    {
-        // Display MST Parent Array
-        System.out.print("\n\n\nMinimum Spanning tree parent array ->>\n");
 
-        // Traverse the MST and convert the integer values to alphabetical characters
-        for (int v = 1; v <= V; ++v)
-
-            if (v == mst[v]) 
-            {
-                // Demark the starting node with an @ symbol
-                System.out.println(toChar(v) + " -> @");
-            } 
-            else 
-            {
-                System.out.println(toChar(v) + " -> " + toChar(mst[v]));
-            }
-
-        // Newline for formatting
-        System.out.print("\n\n");
-    }
 
     // Dijkstra's Shortest Path Algorithm
     public void SPT_Dijkstra(int s)
@@ -322,6 +311,10 @@ class Graph
             parent[i] = 0;
             hPos[i] = 0;
         }
+
+        parent[s] = s;
+        dist[s] = 0;
+        dist[0] = 0;
 
         Heap pq = new Heap(V, dist, hPos);
         pq.insert(s);
@@ -369,7 +362,7 @@ class Graph
             wgt_sum *= -1;
     
             // Print final SPT Weight
-            System.out.print("\n\n\nTOTAL MST WEIGHT ->> " + wgt_sum + "\n\n");
+            System.out.print("TOTAL MST WEIGHT ->> " + wgt_sum + "\n\n");
     
             mst = parent;
 
@@ -417,7 +410,6 @@ class Graph
         Node n;
         Queue<Integer> q = new LinkedList<Integer>();
         System.out.println();
-        System.out.println("Breadth First Traversal:");
 
         // initialise visited
         for (int i = 0; i <= V; i++) 
@@ -467,15 +459,29 @@ public class GraphLists
 
         System.out.println();
 
-        System.out.print("Depth first using recursion:");
-       
-        g.DF(s);
+        System.out.print("Prim's Minimum Spanning Tree:");
+
+        System.out.println();
 
         g.MST_Prim(s);
 
-        g.showMST();
+        System.out.print("Dijkstra's Shortest Path Tree:");
 
-        System.out.print("Breadth first:");
+        // g.SPT_Dijkstra(s);
+
+        System.out.println();
+
+        // g.showSPT();
+
+        System.out.println();
+
+        System.out.print("Depth first search using recursion:\n");
+        System.out.println("Depth First Traversal:");
+       
+        g.DF(s);
+
+        System.out.print("\nBreadth first search using a queue:\n");
+        System.out.println("Breadth First Traversal:");
 
         g.BF(s); 
         
