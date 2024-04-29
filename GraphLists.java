@@ -1,45 +1,41 @@
-// Simple weighted graph representation 
-// Uses an Adjacency Linked Lists, suitable for sparse graphs
+
+// Importing necessary libraries for file reading, data structures, and input/output
 import java.io.*;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.LinkedList;
 
-// Heap Code for efficient implementation of Prim's Algorithm
- class Heap 
- {
+// Definition of the Heap class for efficient implementation of Prim's Algorithm
+class Heap {
+    // Declaring necessary instance variables for the heap
     private int[] a; // heap array
     private int[] hPos; // hPos[h[k]] == k
     private int[] dist; // dist[v] = priority of v
     private int N; // heap size
 
-    // The heap constructor gets passed from the Graph:
-    // 1. maximum heap size
-    // 2. reference to the dist[] array
-    // 3. reference to the hPos[] array
-    public Heap(int maxSize, int[] _dist, int[] _hPos) 
-    {
+    // Constructor for the Heap class
+    // Takes maximum heap size, reference to the dist[] array, and reference to the
+    // hPos[] array
+    public Heap(int maxSize, int[] _dist, int[] _hPos) {
         N = 0;
         a = new int[maxSize + 1];
         dist = _dist;
         hPos = _hPos;
     }
 
-    public boolean isEmpty() 
-    {
+    // Method to check if the heap is empty
+    public boolean isEmpty() {
         return N == 0;
     }
 
-    public void siftUp(int k) 
-    {
-        // k = last element in list
+    // Method to perform sift-up operation in the heap
+    public void siftUp(int k) {
+        // Get the vertex at index k
         int v = a[k];
 
-        // code yourself
-        // must use hPos[] and dist[] arrays
-
-        while (dist[v] < dist[a[k / 2]]) 
-        {
+        // Perform sift-up operation until the vertex's priority is higher than its
+        // parent's priority
+        while (dist[v] < dist[a[k / 2]]) {
             hPos[a[k]] = k / 2;
             a[k] = a[k / 2];
             k = k / 2;
@@ -48,22 +44,19 @@ import java.util.LinkedList;
         hPos[v] = k;
     }
 
-    public void siftDown(int k) 
-    {
+    // Method to perform sift-down operation in the heap
+    public void siftDown(int k) {
         int v, j;
         v = a[k];
 
-        // code yourself
-        // must use hPos[] and dist[] arrays
-        while (k * 2 < N) 
-        {
+        // Perform sift-down operation until the vertex's priority is lower than its
+        // children's priorities
+        while (k * 2 < N) {
             j = k * 2;
-            if (j < N && dist[a[j]] > dist[a[j + 1]]) 
-            {
+            if (j < N && dist[a[j]] > dist[a[j + 1]]) {
                 ++j;
             }
-            if (dist[v] <= dist[a[j]]) 
-            {
+            if (dist[v] <= dist[a[j]]) {
                 break;
             }
 
@@ -75,23 +68,17 @@ import java.util.LinkedList;
         a[k] = v;
     }
 
-    public void insert(int x) 
-    {
-        System.out.println("Inserting: " + toChar(x) + "\n");
-        System.out.println("Visiting node: " + toChar(x) + "\n");
+    // Method to insert a vertex into the heap
+    public void insert(int x) {
+        System.out.println("Inserting: " + toChar(x));
         a[++N] = x;
         siftUp(N);
     }
-    
-    private char toChar(int u) 
-    {
-        return (char) (u + 64);
-    }
 
-    public int remove() 
-    {
+    // Method to remove the minimum vertex from the heap
+    public int remove() {
         int v = a[1];
-        System.out.println("Removing:  " + toChar(v) + "\n");
+        System.out.println("Removing: " + toChar(v));
         hPos[v] = 0;
 
         a[1] = a[N--];
@@ -101,62 +88,63 @@ import java.util.LinkedList;
 
         return v;
     }
+
+    // Method to convert vertex number to corresponding character
+    private char toChar(int u) {
+        return (char) (u + 64);
+    }
 }
 
-class Graph 
-{
-    class Node 
-    {
-        public int vert; // Vertices
+// Definition of the Graph class
+class Graph {
+    // Definition of the Node class for adjacency lists
+    class Node {
+        public int vert; // Vertex
         public int wgt; // Weight
         public Node next; // Next node
     }
 
-    // V = number of vertices
-    // E = number of edges
-    // adj[] is the adjacency lists array
-    private int V, E;
-    private Node[] adj;
-    private Node z;
-    private int[] mst;
+    // Instance variables for the graph
+    private int V, E; // Number of vertices and edges
+    private Node[] adj; // Adjacency lists array
+    private Node z; // Sentinel node
+    private int[] mst; // Minimum Spanning Tree array
 
-    // used for traversing graph
-    private int[] visited;
-    private int id;
+    // Variables for traversing the graph
+    private int[] visited; // Array to track visited vertices
+    private int id; // Identifier for vertices
 
-    // default constructor
-    public Graph(String graphFile) throws IOException 
-    {
-        int u, v;
-        int e, wgt;
-        Node t, w;
+    // Constructor for the Graph class
+    public Graph(String graphFile) throws IOException {
+        int u, v; // Vertices
+        int e, wgt; // Edges and weights
+        Node t, w; // Temporary nodes for edge creation
 
+        // Reading the graph file
         FileReader fr = new FileReader(graphFile);
         BufferedReader reader = new BufferedReader(fr);
 
-        try 
-        {
-            String splits = " +"; // multiple whitespace as delimiter
+        try {
+            String splits = " +"; // Delimiter for splitting lines
             String line = reader.readLine();
             String[] parts = line.split(splits);
             System.out.println("Parts[] = " + parts[0] + " " + parts[1]);
 
-            V = Integer.parseInt(parts[0]);
-            E = Integer.parseInt(parts[1]);
+            V = Integer.parseInt(parts[0]); // Extracting number of vertices
+            E = Integer.parseInt(parts[1]); // Extracting number of edges
 
-            // create sentinel node
+            // Creating sentinel node
             z = new Node();
             z.next = z;
 
-            // create adjacency lists, initialised to sentinel node z
+            // Creating adjacency lists, initialized to sentinel node z
             adj = new Node[V + 1];
             for (v = 1; v <= V; ++v)
                 adj[v] = z;
 
-            // read the edges
+            // Reading the edges from the file
             System.out.println("Reading edges from text file");
-            for (e = 1; e <= E; ++e) 
-            {
+            for (e = 1; e <= E; ++e) {
                 line = reader.readLine();
                 parts = line.split(splits);
                 u = Integer.parseInt(parts[0]);
@@ -165,7 +153,7 @@ class Graph
 
                 System.out.println("Edge " + toChar(u) + "--(" + wgt + ")--" + toChar(v));
 
-                // write code to put edge into adjacency matrix
+                // Creating nodes for the edge and adding them to the adjacency lists
                 t = new Node();
                 t.vert = v;
                 t.wgt = wgt;
@@ -179,34 +167,25 @@ class Graph
                 adj[v] = w;
 
             }
-        } 
-        finally 
-        {
-            // Close the reader in the finally block to ensure it gets closed
-            if (reader != null) 
-            {
+        } finally {
+            // Closing the reader in the finally block to ensure it gets closed
+            if (reader != null) {
                 reader.close();
             }
         }
     }
 
-    // convert vertex into char for pretty printing
-    private char toChar(int u) 
-    {
+    // Method to convert vertex number to corresponding character
+    private char toChar(int u) {
         return (char) (u + 64);
     }
 
-    // method to display the graph representation
-    public void display() 
-    {
+    // Method to display the graph representation
+    public void display() {
         int v;
         Node n;
-
-        System.out.println("\nAdjacency lists data structure:\n");
-        System.out.println("Vertex      Edge Weight");
-
-        for (v = 1; v <= V; ++v) 
-        {
+        System.out.println("Vertex        Edge Weight");
+        for (v = 1; v <= V; ++v) {
             System.out.print("\nadj[" + toChar(v) + "] ->");
             for (n = adj[v]; n != z; n = n.next)
                 System.out.print(" |" + toChar(n.vert) + " | " + n.wgt + "| ->");
@@ -214,22 +193,19 @@ class Graph
         System.out.println("");
     }
 
-
     // Prim's Minimum Spanning Tree Algorithm
-    public void MST_Prim(int s) 
-    {
+    public void MST_Prim(int s) {
         int v;
-        int wgt_sum = 0;
-        int[] dist, parent, hPos;
+        int wgt_sum = 0; // Total weight of MST
+        int[] dist, parent, hPos; // Arrays for distances, parent vertices, and heap positions
         Node t;
 
-        // Initialise arrays
+        // Initializing arrays
         dist = new int[V + 1];
         parent = new int[V + 1];
         hPos = new int[V + 1];
 
-        for (int i = 1; i <= V; i++) 
-        {
+        for (int i = 1; i <= V; i++) {
             dist[i] = Integer.MAX_VALUE;
             parent[i] = 0;
             hPos[i] = 0;
@@ -239,196 +215,123 @@ class Graph
         dist[s] = 0;
         dist[0] = 0;
 
+        // Creating and initializing heap
         Heap pq = new Heap(V, dist, hPos);
         pq.insert(s);
 
-        while (!(pq.isEmpty())) 
-        {
+        // Main loop of Prim's algorithm
+        while (!(pq.isEmpty())) {
             v = pq.remove();
 
-            // Mark vertex as visited by negating the distance
+            // Marking vertex as visited by negating the distance
             dist[v] = -dist[v];
+            System.out.println("Visited: " + toChar(v));
+            System.out.println("\n");
 
             t = adj[v];
 
-            // Check if vertex has an edge to v
-            while (t.next != t) 
-            {
-                // If dist[t.vert] is less than 0, this vertex has been checked
-                if (t.wgt < dist[t.vert] && dist[t.vert] > 0) 
-                {
+            // Iterating through adjacent vertices
+            while (t.next != t) {
+                // If the vertex hasn't been visited and its distance is less than the current
+                // distance
+                if (t.wgt < dist[t.vert] && dist[t.vert] > 0) {
                     dist[t.vert] = t.wgt;
                     parent[t.vert] = v;
 
-                    if (hPos[t.vert] == 0) 
-                    {
+                    // Inserting or updating the vertex in the heap
+                    if (hPos[t.vert] == 0) {
                         pq.insert(t.vert);
-                    } 
-                    else 
-                    {
+                    } else {
                         pq.siftUp(hPos[t.vert]);
                     }
                 }
 
-                // Set t to the next node
+                // Moving to the next adjacent vertex
                 t = t.next;
             }
         }
 
-        // Add up all edge weights of the MST
-        for (int i = 0; i <= V; i++) 
-        {
+        // Calculating total weight of MST
+        for (int i = 0; i <= V; i++) {
             wgt_sum += dist[i];
         }
 
-        // Make sure result is positive integer for printing the final MST weight
+        // Ensuring result is positive integer for printing the final MST weight
         wgt_sum *= -1;
 
-        // Print final MST Weight
-        System.out.print("\nTOTAL MST WEIGHT ->> " + wgt_sum + "\n");
+        // Printing final MST Weight
+        System.out.print("\n\n\nTOTAL MST WEIGHT ->> " + wgt_sum + "\n\n");
 
         mst = parent;
     }
 
+    // Method to display the MST
+    public void showMST() {
+        // Displaying MST Parent Array
+        System.out.print("\n\n\nMinimum Spanning tree parent array ->>\n");
 
+        // Traversing the MST and converting the integer values to alphabetical
+        // characters
+        for (int v = 1; v <= V; ++v)
 
-    // Dijkstra's Shortest Path Algorithm
-    public void SPT_Dijkstra(int s)
-    {
-        int v;
-        int wgt_sum = 0;
-        int[] dist, parent, hPos;
-        Node t;
-
-        // Initialise arrays
-        dist = new int[V + 1];
-        parent = new int[V + 1];
-        hPos = new int[V + 1];
-
-        for (int i = 0; i <= V; i++) 
-        {
-            dist[i] = Integer.MAX_VALUE;
-            parent[i] = 0;
-            hPos[i] = 0;
-        }
-
-        parent[s] = s;
-        dist[s] = 0;
-        dist[0] = 0;
-
-        Heap pq = new Heap(V, dist, hPos);
-        pq.insert(s);
-
-        while (!(pq.isEmpty())) 
-        {
-            v = pq.remove();
-
-            // Mark vertex as visited
-            dist[v] = -dist[v];
-
-            t = adj[v];
-
-            // Check if vertex has an edge to v
-            while (t.next != t) 
-            {
-                // If dist[t.vert] is less than 0, this vertex has been checked
-                if (t.wgt < dist[t.vert] && dist[t.vert] > 0) 
-                {
-                    dist[t.vert] = t.wgt;
-                    parent[t.vert] = v;
-
-                    if (hPos[t.vert] == 0) 
-                    {
-                        pq.insert(t.vert);
-                    } 
-                    else 
-                    {
-                        pq.siftUp(hPos[t.vert]);
-                    }
-                }
-
-                // Set t to the next node
-                t = t.next;
+            if (v == mst[v]) {
+                // Demarking the starting node with an @ symbol
+                System.out.println(toChar(v) + " -> @");
+            } else {
+                System.out.println(toChar(v) + " -> " + toChar(mst[v]));
             }
-        }
 
-            // Add up all edge weights of the SPT
-            for (int i = 0; i <= V; i++) 
-            {
-                wgt_sum += dist[i];
-            }
-    
-            // Make sure result is positive integer for printing the final SPT weight
-            wgt_sum *= -1;
-    
-            // Print final SPT Weight
-            System.out.print("TOTAL MST WEIGHT ->> " + wgt_sum + "\n\n");
-    
-            mst = parent;
-
-    }
-
-    public void showSPT()
-    {
-
+        // Newline for formatting
+        System.out.print("\n\n");
     }
 
     // Depth First Traversal
-    public void DF(int s) 
-    {
+    public void DF(int s) {
         id = 0;
         visited = new int[V + 1];
         System.out.println("");
 
-        for (int j = 1; j <= V; j++) 
-        {
+        for (int j = 1; j <= V; j++) {
             visited[j] = 0;
         }
         dfVisit(0, s);
     }
 
-    private void dfVisit(int prev, int v) 
-    {
+    // Helper method for Depth First Traversal
+    private void dfVisit(int prev, int v) {
         Node n = new Node();
         n = adj[v];
         visited[v] = ++id;
         System.out.println("Visiting node [" + toChar(v) + "] from node [" + toChar(prev) + "]");
-        while (n.next != n) 
-        {
-            if (visited[n.vert] == 0) 
-            {
-                dfVisit(v, n.vert); // recursively call the next vertex
+        while (n.next != n) {
+            if (visited[n.vert] == 0) {
+                dfVisit(v, n.vert); // Recursively call the next vertex
             }
             n = n.next;
         }
     }
 
     // Breadth First Traversal
-    public void BF(int s) 
-    {
+    public void BF(int s) {
         int id = 0;
         Node n;
         Queue<Integer> q = new LinkedList<Integer>();
         System.out.println();
+        System.out.println("Breadth First Traversal:");
 
-        // initialise visited
-        for (int i = 0; i <= V; i++) 
-        {
+        // Initializing visited array
+        for (int i = 0; i <= V; i++) {
             visited[i] = 0;
         }
         q.add(s);
-        while (!(q.isEmpty())) 
-        {
+        while (!(q.isEmpty())) {
             int v = q.poll();
-            if (visited[v] == 0) 
-            {
+            if (visited[v] == 0) {
                 n = adj[v];
                 visited[v] = ++id;
                 System.out.println("Currently visiting [" + toChar(v) + "]");
-                while (n.next != n) 
-                {
-                    if (visited[n.vert] == 0) 
-                    {
+                while (n.next != n) {
+                    if (visited[n.vert] == 0) {
                         q.add(n.vert);
                     }
                     n = n.next;
@@ -441,51 +344,38 @@ class Graph
     }
 }
 
-public class GraphLists 
-{
-    public static void main(String[] args) throws IOException 
-    {
+// Main class for executing the program
+public class GraphLists {
+    // Main method for execution
+    public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
-        String fname;
+        String fname; // Filename for graph definition
         System.out.print("\nInput name of file with graph definition: ");
-        fname = sc.nextLine();
+        fname = sc.nextLine(); // Taking filename input from user
 
         System.out.print("\nInput the number of the vertex you want to start at: ");
-        int s = sc.nextInt();
+        int s = sc.nextInt(); // Taking starting vertex input from user
 
-        Graph g = new Graph(fname);
+        Graph g = new Graph(fname); // Creating graph object from the input file
 
-        g.display();
-
-        System.out.println();
-
-        System.out.print("Prim's Minimum Spanning Tree:");
+        g.display(); // Displaying the graph
 
         System.out.println();
 
-        g.MST_Prim(s);
+        System.out.print("Depth first using recursion:");
 
-        System.out.print("Dijkstra's Shortest Path Tree:");
+        g.DF(s); // Performing Depth First Traversal
 
-        // g.SPT_Dijkstra(s);
+        System.out.println("MST using Prim's Algorithm:\n");
 
-        System.out.println();
+        g.MST_Prim(s); // Finding Minimum Spanning Tree using Prim's Algorithm
 
-        // g.showSPT();
+        g.showMST(); // Displaying the MST
 
-        System.out.println();
+        System.out.print("Breadth first:");
 
-        System.out.print("Depth first search using recursion:\n");
-        System.out.println("Depth First Traversal:");
-       
-        g.DF(s);
+        g.BF(s); // Performing Breadth First Traversal
 
-        System.out.print("\nBreadth first search using a queue:\n");
-        System.out.println("Breadth First Traversal:");
-
-        g.BF(s); 
-        
-        sc.close();
+        sc.close(); // Closing scanner object
     }
 }
-
